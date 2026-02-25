@@ -2,20 +2,21 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "OpenOCD Debug",
+            "name": "STM32 Debug",
             "type": "cortex-debug",
             "request": "launch",
             "servertype": "openocd",
-            "serverpath": "${workspaceFolder}/xpacks/.bin/openocd.exe",
-            "cwd": "${workspaceFolder}",
             "executable": "${workspaceFolder}/build/nucleo-blink.elf",
-            "device": "STM32F411RE",
+            "gdbPath": "/usr/bin/gdb-multiarch",
+            "svdFile": "${workspaceFolder}/STM32F411.svd",
+            "serverpath": "/usr/bin/openocd",
             "configFiles": [
                 "interface/stlink.cfg",
                 "target/stm32f4x.cfg"
             ],
-            "runToMain": true,
-            "showDevDebugOutput": "raw"
+            "runToEntryPoint": "Reset_Handler",
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "build"
         }
     ]
 }
