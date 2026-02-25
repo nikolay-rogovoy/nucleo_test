@@ -4,11 +4,8 @@
             "name": "STM32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "C:/work/projects/STM32CubeF4/Drivers/CMSIS/Include",
-                "C:/work/projects/STM32CubeF4/Drivers/CMSIS/Device/ST/STM32F4xx/Include",
-                "C:/Users/Happy/AppData/Roaming/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/14.2.1-1.1.1/.content/lib/gcc/arm-none-eabi/14.2.1/include",
-                "C:/Users/Happy/AppData/Roaming/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/14.2.1-1.1.1/.content/lib/gcc/arm-none-eabi/14.2.1/include-fixed",
-                "C:/Users/Happy/AppData/Roaming/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/14.2.1-1.1.1/.content/arm-none-eabi/include"
+                "${workspaceFolder}/libs/STM32CubeF4/Drivers/CMSIS/Include",
+                "${workspaceFolder}/libs/STM32CubeF4/Drivers/CMSIS/Device/ST/STM32F4xx/Include"
             ],
             "defines": [
                 "STM32F411xE",           // Ваш конкретный чип
@@ -19,7 +16,7 @@
                 "__weak=__attribute__((weak))",
                 "__packed=__attribute__((__packed__))"
             ],
-            "compilerPath": "${workspaceFolder}/xpacks/.bin/arm-none-eabi-gcc",
+            "compilerPath": "arm-none-eabi-gcc",
             "cStandard": "c17",
             "cppStandard": "c++17",
             "intelliSenseMode": "gcc-arm",

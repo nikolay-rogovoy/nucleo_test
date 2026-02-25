@@ -1,4 +1,3 @@
-#define STM32F411xE
 #include "stm32f4xx.h"
 #include <stdint.h>
 
@@ -59,6 +58,6 @@ int main(void) {
     while(1) {
         // Переключаем состояние светодиода (инверсия 5-го бита ODR)
         GPIOA->ODR ^= (1U << 5);
-        delay(500000);
+        delay(1500000);
     }
 }

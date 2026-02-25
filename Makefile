@@ -6,20 +6,22 @@ SIZE = arm-none-eabi-size
 # Пути
 SRC_DIR = src
 BUILD_DIR = build
+CMSIS_DIR = libs/STM32CubeF4/Drivers
 
-# Пути к заголовочным файлам (ИСПРАВЛЕНО!)
+# Пути к заголовочным файлам
 INCLUDES = -I. \
-           -I"C:/work/projects/STM32CubeF4/Drivers/CMSIS/Include" \
-           -I"C:/work/projects/STM32CubeF4/Drivers/CMSIS/Device/ST/STM32F4xx/Include"
+           -I$(CMSIS_DIR)/CMSIS/Include \
+           -I$(CMSIS_DIR)/CMSIS/Device/ST/STM32F4xx/Include
 
 # Файлы
 SOURCES = $(SRC_DIR)/main.c
 OBJECTS = $(addprefix $(BUILD_DIR)/, $(notdir $(SOURCES:.c=.o)))
 
-# Флаги компилятора (добавлен INCLUDES)
+# Флаги компилятора
 CFLAGS = -mcpu=cortex-m4 \
          -mthumb \
-         -mfloat-abi=soft \
+         -mfloat-abi=hard \
+         -mfpu=fpv4-sp-d16 \
          -DSTM32F411xE \
          $(INCLUDES) \
          -O0 \
@@ -45,7 +47,7 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILD_DIR):
-	if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
+	mkdir -p $(BUILD_DIR)
 
 .PHONY: clean flash
 
@@ -53,6 +55,6 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 flash: $(BUILD_DIR)/$(TARGET).bin
-	openocd -f interface/stlink.cfg \
+	openocd -f interface/stlink-v2-1.cfg \
 	        -f target/stm32f4x.cfg \
 	        -c "program $(BUILD_DIR)/$(TARGET).bin 0x08000000 verify reset exit"
