@@ -55,6 +55,11 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 flash: $(BUILD_DIR)/$(TARGET).bin
-	openocd -f interface/stlink-v2-1.cfg \
+	openocd -f interface/stlink.cfg \
 	        -f target/stm32f4x.cfg \
 	        -c "program $(BUILD_DIR)/$(TARGET).bin 0x08000000 verify reset exit"
+
+flash-elf: $(BUILD_DIR)/$(TARGET).elf
+	openocd -f interface/stlink.cfg \
+	        -f target/stm32f4x.cfg \
+	        -c "program $< verify reset exit"

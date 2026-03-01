@@ -7,6 +7,7 @@
     "build": "make",
     "clean": "make clean",
     "flash": "make flash",
+    "flash-elf": "make flash-elf",
     "rebuild": "make clean && make",
     "debug": "openocd -f interface/stlink.cfg -f target/stm32f4x.cfg",
     "monitor": "openocd -f interface/stlink.cfg -f target/stm32f4x.cfg -c \"gdb_port 3333; telnet_port 4444; init; reset halt;\"",
