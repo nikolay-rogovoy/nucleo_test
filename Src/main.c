@@ -36,6 +36,7 @@
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 static GPIO_InitTypeDef GPIO_InitStruct;
+static uint32_t last_tick = 0;
 
 /* Private function prototypes -----------------------------------------------*/
 static void SystemClock_Config(void);
@@ -57,11 +58,10 @@ int main(void)
        - Global MSP (MCU Support Package) initialization
      */
   HAL_Init();
+  SystemClock_Config();
 
   UART_Init();
-
-  /* Configure the system clock to 100 MHz */
-  SystemClock_Config();
+  UART_StartReceive();
 
   /*##-1- Enable GPIOA Clock (to be able to program the configuration registers) */
   __HAL_RCC_GPIOA_CLK_ENABLE();
@@ -73,16 +73,27 @@ int main(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  int counter = 0;
+  last_tick = HAL_GetTick();
+  // int counter = 0;
   while (1)
   {
-    char msg[64];
-    snprintf(msg, sizeof(msg), "Counter: %d\r\n", counter++);
-    UART_SendString(msg);
+    UART_ProcessInput();
+    uint32_t current_tick = HAL_GetTick();
+    uint8_t tick = 0;
+    if (current_tick - last_tick >= 1000)
+    {
+      last_tick = current_tick;
+      tick = 1;
+    }
 
-    HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+    if (tick)
+    {
+      // char msg[64];
+      // snprintf(msg, sizeof(msg), "Counter: %d\r\n", counter++);
+      // UART_SendString(msg);
 
-    HAL_Delay(1000);
+      // HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+    }
   }
 }
 
@@ -106,6 +117,41 @@ int main(void)
  * @param  None
  * @retval None
  */
+void SystemClock_Config1(void)
+{
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+
+  // 1. Включаем внешний генератор HSE (8 МГц на плате Nucleo)
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLM = 8;             // Делитель входной частоты
+  RCC_OscInitStruct.PLL.PLLN = 336;           // Множитель (8 * 336 / 8 = 336 МГц VCO)
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2; // Делитель для системы (336 / 2 = 168 МГц SYSCLK)
+  RCC_OscInitStruct.PLL.PLLQ = 7;             // Делитель для периферии (336 / 7 = 48 МГц)
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    // Ошибка инициализации
+    while (1)
+      ;
+  }
+
+  // 2. Настраиваем шины
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1; // 168 МГц
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;  // 168 МГц (макс для F411)
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;  // 168 МГц
+
+  // 3. Применяем настройки (FLASH_LATENCY_5 нужен для 168 МГц)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK)
+  {
+    while (1)
+      ;
+  }
+}
 static void SystemClock_Config(void)
 {
   RCC_ClkInitTypeDef RCC_ClkInitStruct;

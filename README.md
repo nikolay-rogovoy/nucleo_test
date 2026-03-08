@@ -96,3 +96,6 @@ arm-none-eabi-strings build/nucleo-blink.bin | grep "Error"
 │ size       │ Размер секций             │ -A (подробно), -B (berkelian)                        │
 │ ar         │ Работа с .a библиотеками  │ -t (list), -x (extract), -tv (verbose)               │
 └────────────┴───────────────────────────┴──────────────────────────────────────────────────────┘
+
+# Подключится к порту
+picocom -b 115200 /dev/ttyACM0
